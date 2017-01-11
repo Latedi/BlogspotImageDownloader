@@ -29,7 +29,7 @@ while(True):
 	request = urllib.request.Request(url)
 	requestData = urllib.request.urlopen(request, None)
 	encoding = requestData.headers.get_content_charset()
-	str_requestData = requestData.readall().decode(encoding)
+	str_requestData = requestData.read().decode(encoding)
 	soup = BeautifulSoup(str_requestData, 'html.parser')
 	posts = soup.findAll("div", {"class" : "post-body"})
 
@@ -38,33 +38,33 @@ while(True):
 		for image in images:
 			source = image["src"]
 			title = source.split("/")[-1]
-			
+
 			title = "".join(c for c in title if c.isalnum() or c in extrachars).rstrip()
-			
+
 			if(source[0] == '/'):
 				source = "https:" + source
 			fullfilepath = os.path.abspath(args.destination + title)
 			extension = os.path.splitext(source)[1]
-			
+
 			try:
 				imageresponse = urllib.request.urlopen(source, None)
 			except:
 				print("Encountered a 404 image")
 				continue
-			
+
 			guess = ['']
 			if(extension == ''):
 				contenttype = imageresponse.info()["Content-Type"]
 				guess = guess_all_extensions(contenttype, True)
 				fullfilepath += guess[0]
-				
+
 			if(len(fullfilepath) > MAX_PATH):
 				difference = len(fullfilepath) - MAX_PATH
 				title = title[-(len(title)-difference)]
 				fullfilepath = os.path.abspath(args.destination + title + guess[0])
-			
+
 			try:
-				
+
 				file = None
 				if(os.path.isfile(fullfilepath)):
 					print("Downloaded an image but had to rename it (it probably already existed)")
@@ -75,7 +75,7 @@ while(True):
 			except Exception as e:
 				print("Failed to write to file")
 				continue
-			
+
 	next = soup.find("a", {"class" : "blog-pager-older-link"})
 	if(next != None):
 		url = next["href"]
