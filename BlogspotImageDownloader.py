@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from mimetypes import guess_all_extensions
 import shutil
 import random
+import re
 
 extrachars = [' ', '-', '_', '.']
 MAX_PATH = 260
@@ -36,7 +37,7 @@ while(True):
 	for post in posts:
 		images = post.findAll("img")
 		for image in images:
-			source = image["src"]
+			source = re.sub('\/s320\/', '/s1600/', image["src"])
 			title = source.split("/")[-1]
 
 			title = "".join(c for c in title if c.isalnum() or c in extrachars).rstrip()
